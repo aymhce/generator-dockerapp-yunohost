@@ -7,7 +7,7 @@ dockerapp_ynh_checkinstalldocker () {
 	then
 		# install
 		curl -sSL https://get.docker.com | sh
-		systemctl enable docker
+		[ ! -f /var/run/docker.sock ] && systemctl start docker && systemctl enable docker
 		pip install docker-compose
 		MORE_LOG="despite previous docker installation"
 
