@@ -1,0 +1,45 @@
+{
+    "name": "<%= beautifulName %>",
+    "id": "<%= idName %>",
+    "url": "<%= urlApp %>",
+    "packaging_format": 1,
+    "description": {
+        "en": "<%= enDescription %>",
+        "fr": "<%= frDescription %>"
+    },
+    "license": "GNU GPL",
+    "maintainer": {
+        "name": "<%= authorName %>",
+        "email": "<%= authorEmail %>"
+    },
+    "requirements": {
+        "yunohost": ">> 2.5"
+    },
+    "services": [
+        "nginx"
+     ],
+    "multi_instance": true,
+    "arguments": {
+        "install" : [
+            {
+                "name": "domain",
+                "type": "domain",
+                "ask": {
+                    "en": "Choose a domain for <%= beautifulName %>",
+                    "fr": "Choisissez un domaine pour <%= beautifulName %>"
+                },
+                "example": "app.domain.org"
+            }<% if (defaultPath != "") { %>,
+            {
+                "name": "path",
+                "type": "path",
+                "ask": {
+                    "en": "Choose a path for <%= beautifulName %>",
+                    "fr": "Choisissez un chemin pour <%= beautifulName %>"
+                },
+                "example": "/mypath",
+                "default": "/<%= defaultPath %>"
+            }<% } %>
+        ]
+    }
+}

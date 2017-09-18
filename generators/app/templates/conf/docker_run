@@ -1,0 +1,2 @@
+# example :
+# docker -d --name=YNH_APP --restart always -p YNH_PORT:8080 -v YNH_DATA/data:/data -v YNH_DATA/conf:/conf image

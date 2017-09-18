@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# check or do docker install
+dockerapp_ynh_checkinstalldocker () {
+	ret=$(sh _dockertest)
+        if [ $ret == 127 ]
+	then
+		# install
+		curl -sSL https://get.docker.com | sh
+		systemctl enable docker
+		pip install docker-compose
+		MORE_LOG="despite previous docker installation"
+
+		# retest
+		ret=$(sh _dockertest)
+	fi
+
+	if [ $ret != 0 ]
+	then
+		ynh_die "Sorry ! Your Docker deamon don't work $MORE_LOG ... Please check your system logs. If your already in a Docker container please add ' -v /var/run/docker.sock: /var/run/docker.sock'"
+	fi
+}
+
+# load variables
+dockerapp_ynh_loadvariables () {
+	data_path=/home/yunohost.docker/$app
+<% if (defaultPath != "") { %>path=$(ynh_normalize_url_path $path)<% } else { %>path=/<%}%>
+	port=$(ynh_find_port 21986)
+}
+
+# docker run
+dockerapp_ynh_run () {
+	sed -i "s@YNH_APP@$app@g" ../conf/docker_run
+        sed -i "s@YNH_DATA@$data_path@g" ../conf/docker_run
+	sed -i "s@YNH_PORT@$port@g" ../conf/docker_run
+        sed -i "s@YNH_PATH@$path@g" ../conf/docker_run
+	sed -i "s@YNH_APP@$app@g" ../conf/docker-compose.yml
+	sed -i "s@YNH_DATA@$data_path@g" ../conf/docker-compose.yml
+	sed -i "s@YNH_PORT@$port@g" ../conf/docker-compose.yml
+	sed -i "s@YNH_PATH@$path@g" ../conf/docker-compose.yml
+	ret=$(sh ../conf/docker_run)
+        if [ $ret != 0 ]
+	then
+		docker logs $app
+                ynh_die "Sorry ! App cannot start with docker. Please check docker logs"
+        fi
+}
+
+# docker rm
+dockerapp_ynh_rm () {
+	sh ../conf/docker_rm
+}
+
+# Modify Nginx configuration file and copy it to Nginx conf directory
+dockerapp_ynh_preparenginx () {
+	sed -i "s@YNH_PATH@$path@g" ../conf/nginx.conf
+	sed -i "s@YNH_HOST@$docker_host@g" ../conf/nginx.conf
+	sed -i "s@YNH_PORT@$port@g" ../conf/nginx.conf
+	nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
+	sudo cp ../conf/nginx.conf $nginxconf
+	sudo chown root: $nginxconf
+	sudo chmod 600 $nginxconf
+}
+
+# Reload Nginx and regenerate SSOwat conf
+dockerapp_ynh_reloadservices () {
+	sudo service nginx reload
+	sudo yunohost app ssowatconf
+}

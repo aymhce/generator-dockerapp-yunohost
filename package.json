@@ -1,0 +1,55 @@
+{
+  "name": "generator-dockerapp-yunohost",
+  "version": "0.0.0",
+  "description": "Generate Docker App for Yunohost",
+  "homepage": "https://github.com/aymhce/dockerappmodel_ynh",
+  "author": {
+    "name": "aymhce",
+    "email": "aymhce@gmail.com",
+    "url": ""
+  },
+  "files": [
+    "generators"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "docker",
+    "app",
+    "application",
+    "yunohost",
+    "hosting",
+    "yeoman-generator"
+  ],
+  "devDependencies": {
+    "yeoman-test": "^1.6.0",
+    "yeoman-assert": "^3.0.0",
+    "coveralls": "^2.13.1",
+    "nsp": "^2.6.3",
+    "eslint": "^4.1.0",
+    "eslint-config-xo-space": "^0.16.0",
+    "jest": "^21.0.0",
+    "jest-cli": "^21.0.0"
+  },
+  "dependencies": {
+    "yeoman-generator": "^1.0.0",
+    "chalk": "^1.1.3",
+    "yosay": "^2.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "prepublish": "nsp check",
+    "pretest": "eslint . --fix",
+    "test": "jest"
+  },
+  "eslintConfig": {
+    "extends": "xo-space",
+    "env": {
+      "jest": true,
+      "node": true
+    }
+  },
+  "repository": "domainelibre/generator-dockerapp-yunohost",
+  "license": "GPL-3.0"
+}

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eu
+
+# Retrieve arguments
+app=$YNH_APP_INSTANCE_NAME
+domain=$YNH_APP_ARG_DOMAIN
+<% if (defaultPath != "") { %>path=$YNH_APP_ARG_PATH
+<% } %>
+
+# Source YunoHost helpers
+. /usr/share/yunohost/helpers
+. _common
+ynh_abort_if_errors
+
+# check or install docker
+dockerapp_ynh_checkinstalldocker
+
+# Check domain/path availability
+dockerapp_ynh_loadvariables
+ynh_webpath_available $domain $path
+ynh_webpath_register $app $domain $path
+
+# Copy files to the right place
+sudo rm -rf $data_path
+sudo mkdir -p $data_path
+
+# docker run
+dockerapp_ynh_run
+
+# Modify Nginx configuration file and copy it to Nginx conf directory
+dockerapp_ynh_preparenginx
+
+# Reload Nginx and regenerate SSOwat conf
+dockerapp_ynh_reloadservices

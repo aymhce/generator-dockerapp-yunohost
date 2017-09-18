@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -u
+
+# See comments in install script
+app=$YNH_APP_INSTANCE_NAME
+
+# Source YunoHost helpers
+. /usr/share/yunohost/helpers
+. _common
+
+# Retrieve app settings
+domain=$(ynh_app_setting_get "$app" domain)
+dockerapp_ynh_loadvariables
+
+# docker rm
+dockerapp_ynh_rm
+
+# Remove conf and app
+sudo rm -rf $data_path
+sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+
+# Reload Nginx and regenerate SSOwat conf
+dockerapp_ynh_reloadservices

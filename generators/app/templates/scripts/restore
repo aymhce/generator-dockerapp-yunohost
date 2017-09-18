@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -eu
+
+. /usr/share/yunohost/helpers
+. _common
+ynh_abort_if_errors
+
+app=$YNH_APP_INSTANCE_NAME
+
+domain=$(ynh_app_setting_get "$app" domain)
+<% if (defaultPath != "") { %>path=$(ynh_app_setting_get "$app" path)
+<% } %>
+
+test ! -d /home/yunohost.docker/$app \
+        || ynh_die "There is already a directory: /home/yunohost.docker/$app "
+dockerapp_ynh_loadvariables
+
+# check or install docker
+dockerapp_ynh_checkinstalldocker
+
+sudo cp -a ./data "$data_path"
+
+# docker run
+dockerapp_ynh_run
+
+cp -a ./conf/nginx.conf "/etc/nginx/conf.d/$domain.d/$app.conf"
+
+# Reload Nginx and regenerate SSOwat conf
+dockerapp_ynh_reloadservices
