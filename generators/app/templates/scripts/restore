@@ -3,12 +3,6 @@
 set -eu
 
 . /usr/share/yunohost/helpers
-[ ! -e _common ] && cp ../settings/scripts/_common ./_common
-[ ! -e _dockertest ] && cp ../settings/scripts/_dockertest ./_dockertest
-[ ! -e docker_run ] && cp ../settings/scripts/docker_run ./docker_run
-[ ! -e docker_rm ] && cp ../settings/scripts/docker_rm ./docker_rm
-[ ! -e docker-compose.yml ] && cp ../settings/scripts/docker-compose.yml ./docker-compose.yml
-. _common
 
 ynh_abort_if_errors
 
@@ -20,6 +14,14 @@ domain=$(ynh_app_setting_get "$app" domain)
 
 test ! -d /home/yunohost.docker/$app \
         || ynh_die "There is already a directory: /home/yunohost.docker/$app "
+
+[ ! -e _common ] && cp ../settings/scripts/_common ./_common
+[ ! -e _dockertest ] && cp ../settings/scripts/_dockertest ./_dockertest
+[ ! -e docker_run ] && cp ../settings/scripts/docker_run ./docker_run
+[ ! -e docker_rm ] && cp ../settings/scripts/docker_rm ./docker_rm
+[ ! -e docker-compose.yml ] && cp ../settings/scripts/docker-compose.yml ./docker-compose.yml
+. _common
+
 dockerapp_ynh_loadvariables
 
 # check or install docker
