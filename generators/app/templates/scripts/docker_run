@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# example :
+#
+#image=portainer/portainer:1.14.0
+#[ "$architecture" == "i386" ]  && image=portainer/portainer:linux-386-1.14.0
+#[ "$architecture" == "armhf" ] && image=portainer/portainer:linux-arm-1.14.0
+#
+#options="-p YNH_PORT:9000 -v YNH_DATA/data:/data"
+#
+#other_options=
+#[ "$incontainer" == "0" ] && other_options=
+#
+#docker run -d --name=YNH_APP --restart always $options $other_options $image
+#

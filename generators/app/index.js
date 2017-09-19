@@ -66,10 +66,16 @@ module.exports = class extends Generator {
 
   writing() {
     this.fs.copyTpl(this.templatePath('check_process'), this.destinationPath('check_process'), this.props);
-    this.fs.copyTpl(this.templatePath('conf/docker_run'), this.destinationPath('conf/docker_run'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker_run'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker_run'), this.destinationPath('scripts/docker_run'), this.props);
+    }
     this.fs.copyTpl(this.templatePath('conf/nginx.conf'), this.destinationPath('conf/nginx.conf'), this.props);
-    this.fs.copyTpl(this.templatePath('conf/docker_rm'), this.destinationPath('conf/docker_rm'), this.props);
-    this.fs.copyTpl(this.templatePath('conf/docker-compose.yml'), this.destinationPath('conf/docker-compose.yml'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker_rm'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker_rm'), this.destinationPath('scripts/docker_rm'), this.props);
+    }
+    if (!this.fs.exists(this.destinationPath('scripts/docker-compose.yml'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker-compose.yml'), this.destinationPath('scripts/docker-compose.yml'), this.props);
+    }
     this.fs.copyTpl(this.templatePath('manifest.json'), this.destinationPath('manifest.json'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/upgrade'), this.destinationPath('scripts/upgrade'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/_common'), this.destinationPath('scripts/_common'), this.props);
@@ -78,12 +84,14 @@ module.exports = class extends Generator {
     this.fs.copyTpl(this.templatePath('scripts/remove'), this.destinationPath('scripts/remove'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/restore'), this.destinationPath('scripts/restore'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/backup'), this.destinationPath('scripts/backup'), this.props);
-    this.fs.copyTpl(this.templatePath('README.md'), this.destinationPath('README.md'), this.props);
+    if (!this.fs.exists(this.destinationPath('README.md'))) {
+      this.fs.copyTpl(this.templatePath('README.md'), this.destinationPath('README.md'), this.props);
+    }
     this.fs.copyTpl(this.templatePath('LICENSE'), this.destinationPath('LICENSE'), this.props);
     this.config.set(this.props);
   }
 
   install() {
-    this.log('Please fill up conf/docker_run and conf/docker_rm, as you want there is also conf/docker-compose.yml');
+    this.log('Please fill up "scripts/docker_run" and "scripts/docker_rm", as you want there is also "scripts/docker-compose.yml"');
   }
 };

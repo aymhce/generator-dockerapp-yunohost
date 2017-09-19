@@ -3,14 +3,20 @@
 set -eu
 
 . /usr/share/yunohost/helpers
+[ ! -e _common ] && cp ../settings/scripts/_common ./_common
+[ ! -e _dockertest ] && cp ../settings/scripts/_dockertest ./_dockertest
+[ ! -e docker_run ] && cp ../settings/scripts/docker_run ./docker_run
+[ ! -e docker_rm ] && cp ../settings/scripts/docker_rm ./docker_rm
+[ ! -e docker-compose.yml ] && cp ../settings/scripts/docker-compose.yml ./docker-compose.yml
 . _common
+
 ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get "$app" domain)
 <% if (defaultPath != "") { %>path=$(ynh_app_setting_get "$app" path)
-<% } %>
+<% } %>is_public=$(ynh_app_setting_get "$app" is_public)
 
 test ! -d /home/yunohost.docker/$app \
         || ynh_die "There is already a directory: /home/yunohost.docker/$app "
@@ -25,6 +31,12 @@ sudo cp -a ./data "$data_path"
 dockerapp_ynh_run
 
 cp -a ./conf/nginx.conf "/etc/nginx/conf.d/$domain.d/$app.conf"
+
+# Make app public if necessary or protect it
+if [ $is_public -eq 1 ]
+then
+        ynh_app_setting_set $app skipped_uris "/"
+fi
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices

@@ -3,7 +3,9 @@
 set -eu
 
 . /usr/share/yunohost/helpers
+[ ! -e _common ] && cp ../settings/scripts/_common ./_common
 . _common
+
 ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME

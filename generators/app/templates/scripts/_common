@@ -1,25 +1,43 @@
 #!/bin/bash
 
+# test in container
+dockerapp_ynh_incontainer () {
+        if [ -f /.dockerenv ]; then
+                echo "0"
+        else
+                echo "1"
+        fi
+}
+
 # check or do docker install
 dockerapp_ynh_checkinstalldocker () {
 	ret=$(sh _dockertest)
+	incontainer=$(dockerapp_ynh_incontainer)
         if [ $ret == 127 ]
 	then
 		# install
-		[ ! -e /var/run/docker.sock ] && start_docker=1
+		start_docker="0"
+		[ ! -e /var/run/docker.sock ] && [ -z "$DOCKER_HOST" ] && start_docker="1"
 		curl -sSL https://get.docker.com | sh
-		[ $start_docker == 1 ] && systemctl start docker && systemctl enable docker
+		[ "$start_docker" == "1" ] && systemctl start docker && systemctl enable docker
 		pip install docker-compose
-		MORE_LOG="despite previous docker installation"
+		MORE_LOG1=" despite previous docker installation"
 
 		# retest
 		ret=$(sh _dockertest)
 	fi
 
+        if [ "$incontainer" == "0" ]
+        then
+                echo "Ho ! You are in a Docker container :)";
+		MORE_LOG2=" If your already in a Docker container please add '' -e DOCKER_HOST=tcp://$(hostname -I | awk '{print $1}'):2376 '' or '' -v /var/run/docker.sock: /var/run/docker.sock ''"
+        fi
+
 	if [ $ret != 0 ]
 	then
-		ynh_die "Sorry ! Your Docker deamon don't work $MORE_LOG ... Please check your system logs. If your already in a Docker container please add ' -v /var/run/docker.sock: /var/run/docker.sock'"
+		ynh_die "Sorry ! Your Docker deamon don't work$MORE_LOG1 ... Please check your system logs.$MORE_LOG2"
 	fi
+
 }
 
 # load variables
@@ -27,20 +45,29 @@ dockerapp_ynh_loadvariables () {
 	data_path=/home/yunohost.docker/$app
 <% if (defaultPath != "") { %>path=$(ynh_normalize_url_path $path)<% } else { %>path=/<%}%>
 	port=$(ynh_find_port 21986)
+	export architecture=$(dpkg --print-architecture)
+	export incontainer=$(dockerapp_ynh_incontainer)
+        if [ "$incontainer" == "0" ]
+        then
+                docker_host=$(/sbin/ip route|awk '/default/ { print $3 }')
+        else
+                docker_host=$(hostname -I | awk '{print $1}')
+        fi
+
 }
 
 # docker run
 dockerapp_ynh_run () {
-	sed -i "s@YNH_APP@$app@g" ../conf/docker_run
-        sed -i "s@YNH_DATA@$data_path@g" ../conf/docker_run
-	sed -i "s@YNH_PORT@$port@g" ../conf/docker_run
-        sed -i "s@YNH_PATH@$path@g" ../conf/docker_run
-	sed -i "s@YNH_APP@$app@g" ../conf/docker-compose.yml
-	sed -i "s@YNH_DATA@$data_path@g" ../conf/docker-compose.yml
-	sed -i "s@YNH_PORT@$port@g" ../conf/docker-compose.yml
-	sed -i "s@YNH_PATH@$path@g" ../conf/docker-compose.yml
-	ret=$(sh ../conf/docker_run)
-        if [ $ret != 0 ]
+	sed -i "s@YNH_APP@$app@g" docker_run
+        sed -i "s@YNH_DATA@$data_path@g" docker_run
+	sed -i "s@YNH_PORT@$port@g" docker_run
+        sed -i "s@YNH_PATH@$path@g" docker_run
+	sed -i "s@YNH_APP@$app@g" docker-compose.yml
+	sed -i "s@YNH_DATA@$data_path@g" docker-compose.yml
+	sed -i "s@YNH_PORT@$port@g" docker-compose.yml
+	sed -i "s@YNH_PATH@$path@g" docker-compose.yml
+	ret=$(bash docker_run)
+        if [ "$ret" == "0" ]
 	then
 		docker logs $app
                 ynh_die "Sorry ! App cannot start with docker. Please check docker logs"
@@ -49,7 +76,8 @@ dockerapp_ynh_run () {
 
 # docker rm
 dockerapp_ynh_rm () {
-	sh ../conf/docker_rm
+	sed -i "s@YNH_APP@$app@g" docker_rm
+	bash docker_rm
 }
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
