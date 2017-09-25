@@ -2,6 +2,10 @@
 
 set -eu
 
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
 # Retrieve arguments
 app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
@@ -10,34 +14,72 @@ domain=$YNH_APP_ARG_DOMAIN
 <% } %><% if (adminUserOption) { %>admin=$YNH_APP_ARG_ADMIN
 <% } %>
 
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
 . _common
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
 ynh_abort_if_errors
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
 
 # store settings
 <% if (secureAccessOption) { %>ynh_app_setting_set $app is_public $is_public
 <% } %><% if (adminUserOption) { %>ynh_app_setting_set $app admin $admin
 <% } %>
 
-# check or install docker
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+
+# Check or install docker
 dockerapp_ynh_checkinstalldocker
 
 # Check domain/path availability
 dockerapp_ynh_loadvariables
 ynh_webpath_available $domain $path
 ynh_webpath_register $app $domain $path
+
+#=================================================
+# MODIFY A CONFIG FILE
+#=================================================
+
 dockerapp_ynh_findreplaceallvaribles
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
 
 # Copy files to the right place
 sudo rm -rf $data_path
 sudo mkdir -p $data_path
 
+#=================================================
+# START AND CREATE SERVICE
+#=================================================
+
 # docker run
 dockerapp_ynh_run
 
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
 
 <% if (secureAccessOption) { %>
 # Make app public if necessary or protect it
@@ -49,6 +91,9 @@ fi
 <% if (forceSecureAccess) { %><% } else { %>ynh_app_setting_set $app skipped_uris "/"<% } %>
 <% } %>
 
+#=================================================
+# RELOAD NGINX
+#=================================================
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices

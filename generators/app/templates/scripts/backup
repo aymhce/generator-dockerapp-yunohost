@@ -2,20 +2,39 @@
 
 set -eu
 
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 . /usr/share/yunohost/helpers
 [ ! -e _common ] && cp ../settings/scripts/_common ./_common
 . _common
 
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
 ynh_abort_if_errors
 
-app=$YNH_APP_INSTANCE_NAME
+#=================================================
+# LOAD SETTINGS
+#=================================================
 
+app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 <% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
 <% } %>
 
 dockerapp_ynh_loadvariables
 
+#=================================================
+# BACKUP THE APP MAIN DIR
+#=================================================
+
 ynh_backup "$data_path" "data" 1
+
+#=================================================
+# BACKUP THE NGINX CONFIGURATION
+#=================================================
 
 ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"

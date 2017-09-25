@@ -2,23 +2,47 @@
 
 set -u
 
-# See comments in install script
-app=$YNH_APP_INSTANCE_NAME
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
 . _common
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
 # Retrieve app settings
+app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
+
 dockerapp_ynh_loadvariables
+
+#=================================================
+# STOP AND REMOVE SERVICE
+#=================================================
 
 # docker rm
 dockerapp_ynh_rm
 
+#=================================================
+# REMOVE APP MAIN DIR
+#=================================================
+
 # Remove conf and app
 sudo rm -rf $data_path
+
+#=================================================
+# REMOVE NGINX CONFIGURATION
+#=================================================
+
 sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+
+#=================================================
+# RELOAD NGINX
+#=================================================
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices

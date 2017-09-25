@@ -2,15 +2,26 @@
 
 set -eu
 
-# See comments in install script
-app=$YNH_APP_INSTANCE_NAME
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
 . _common
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
 ynh_abort_if_errors
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
 # Retrieve app settings
+app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 <% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
 <% } %><% if (secureAccessOption) { %>is_public=$(ynh_app_setting_get "$app" is_public)
@@ -18,16 +29,37 @@ domain=$(ynh_app_setting_get "$app" domain)
 <% } %>
 
 dockerapp_ynh_loadvariables
+
+#=================================================
+# MODIFY A CONFIG FILE
+#=================================================
+
 dockerapp_ynh_findreplaceallvaribles
+
+#=================================================
+# STOP AND REMOVE SERVICE
+#=================================================
 
 # docker rm
 dockerapp_ynh_rm
 
+#=================================================
+# START AND CREATE SERVICE
+#=================================================
+
 # docker run
 dockerapp_ynh_run
 
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
 
 <% if (secureAccessOption) { %>
 # Make app public if necessary or protect it
@@ -38,6 +70,10 @@ else
     ynh_app_setting_set $app protected_uris "/"
 fi
 <% } %>
+
+#=================================================
+# RELOAD NGINX
+#=================================================
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices
