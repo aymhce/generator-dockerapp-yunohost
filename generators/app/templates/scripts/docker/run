@@ -7,8 +7,6 @@
 #[ "$architecture" == "armhf" ] && image=portainer/portainer:linux-arm-1.14.0
 #[ "$architecture" == "minitel" ] && ynh_die "Sorry, your minitel architecture is not supported ..."
 #
-#cp -rf ../conf/app YNH_DATA/data
-#
 #options="-p YNH_PORT:9000 -v YNH_DATA/data:/data"
 #
 #other_options="--add-host yunohost:YNH_HOST"

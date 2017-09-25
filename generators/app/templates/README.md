@@ -5,10 +5,10 @@
 
 <%= enDescription %>
 
-[See more](<%= urlApp %>)
+**[See more](<%= urlApp %>)**
 
 This app is inside a [Docker image](<%= urlDockerHub %>).
 
-==========
+-----------------
 
-It was generated with [DockerApp Yunohost](https://github.com/aymhce/dockerappmodel_ynh/)
+*It was generated with [DockerApp Yunohost](https://github.com/aymhce/dockerappmodel_ynh/)*
