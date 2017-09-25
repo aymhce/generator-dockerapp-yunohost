@@ -93,10 +93,10 @@ dockerapp_ynh_copyconf () {
 # docker run
 dockerapp_ynh_run () {
 	ret=$(bash docker/run)
-        if [ "$ret" == "0" ]
+        if [ "$ret" != "0" ]
 	then
 		docker logs $app
-                ynh_die "Sorry ! App cannot start with docker. Please check docker logs"
+                ynh_die "Sorry ! App cannot start with docker. Please check docker logs."
         fi
 }
 
