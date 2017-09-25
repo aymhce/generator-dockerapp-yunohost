@@ -5,7 +5,6 @@ const yosay = require('yosay');
 
 module.exports = class extends Generator {
   prompting() {
-    // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the wondrous ' + chalk.red('generator-dockerapp-yunohost') + ' generator!'
     ));
@@ -13,17 +12,32 @@ module.exports = class extends Generator {
     const prompts = [{
       type: 'input',
       name: 'beautifulName',
-      message: 'Your Yunohost App name?',
+      message: 'Your Yunohost App name ?',
       default: this.appname
     }, {
       type: 'input',
-      name: 'defaultPath',
-      message: 'There is a contextPath like /mypath (can be empty)?',
+      name: 'defaultPathOption',
+      message: 'Active context path option (like "/mypath") - can be empty ?',
       default: ''
+    }, {
+      type: 'confirm',
+      name: 'forceSecureAccess',
+      message: 'Active secure access by default ?',
+      default: true
+    }, {
+      type: 'confirm',
+      name: 'secureAccessOption',
+      message: 'Active secure access option (public access or yunohost auth) ?',
+      default: false
+    }, {
+      type: 'confirm',
+      name: 'adminUserOption',
+      message: 'Active admin user option (admin app access for user) ?',
+      default: false
     }, {
       type: 'input',
       name: 'enDescription',
-      message: 'English description?',
+      message: 'English description ?',
       default: ''
     }, {
       type: 'input',
@@ -33,17 +47,22 @@ module.exports = class extends Generator {
     }, {
       type: 'input',
       name: 'urlApp',
-      message: 'App original url creators?',
+      message: 'App original url creators ?',
+      default: ''
+    }, {
+      type: 'input',
+      name: 'urlDockerHub',
+      message: 'DockerHub image url ?',
       default: ''
     }, {
       type: 'input',
       name: 'authorName',
-      message: 'Your name?',
+      message: 'Your name ?',
       default: this.user.git.name()
     }, {
       type: 'input',
       name: 'authorEmail',
-      message: 'Your email?',
+      message: 'Your email ?',
       default: this.user.git.email()
     }];
 
@@ -52,7 +71,6 @@ module.exports = class extends Generator {
       return this.props;
     }
     return this.prompt(prompts).then(props => {
-      // To access props later use this.props.someAnswer;
       this.props = props;
       this.props.idName = this.props.beautifulName.toLowerCase();
       if (!this.props.enDescription) {
@@ -66,16 +84,20 @@ module.exports = class extends Generator {
 
   writing() {
     this.fs.copyTpl(this.templatePath('check_process'), this.destinationPath('check_process'), this.props);
-    if (!this.fs.exists(this.destinationPath('scripts/docker_run'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker_run'), this.destinationPath('scripts/docker_run'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/run'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/run'), this.destinationPath('scripts/docker/run'), this.props);
     }
     this.fs.copyTpl(this.templatePath('conf/nginx.conf'), this.destinationPath('conf/nginx.conf'), this.props);
-    if (!this.fs.exists(this.destinationPath('scripts/docker_rm'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker_rm'), this.destinationPath('scripts/docker_rm'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/rm'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/rm'), this.destinationPath('scripts/docker/rm'), this.props);
     }
-    if (!this.fs.exists(this.destinationPath('scripts/docker-compose.yml'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker-compose.yml'), this.destinationPath('scripts/docker-compose.yml'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/docker-compose.yml'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/docker-compose.yml'), this.destinationPath('scripts/docker/docker-compose.yml'), this.props);
     }
+    if (!this.fs.exists(this.destinationPath('scripts/docker/_specificvariablesapp'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/_specificvariablesapp'), this.destinationPath('scripts/docker/_specificvariablesapp'), this.props);
+    }
+    this.fs.copyTpl(this.templatePath('conf/app/.gitkeep'), this.destinationPath('conf/app/.gitkeep'), this.props);
     this.fs.copyTpl(this.templatePath('manifest.json'), this.destinationPath('manifest.json'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/upgrade'), this.destinationPath('scripts/upgrade'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/_common'), this.destinationPath('scripts/_common'), this.props);
@@ -92,6 +114,6 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.log('Please fill up "scripts/docker_run" and "scripts/docker_rm", as you want there is also "scripts/docker-compose.yml"');
+    this.log('Please fill up "scripts/docker/run" and "scripts/docker/rm", as you want there is "scripts/docker/docker-compose.yml" and "scripts/docker/_specificvariablesapp". Also, place your app config in conf/app, will be copied in /home/yunohost.docker/{appname}');
   }
 };

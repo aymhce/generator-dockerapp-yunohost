@@ -5,8 +5,10 @@ set -eu
 # Retrieve arguments
 app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
-<% if (defaultPath != "") { %>path=$YNH_APP_ARG_PATH
-<% } %>is_public=$YNH_APP_ARG_IS_PUBLIC
+<% if (defaultPathOption != "") { %>path=$YNH_APP_ARG_PATH
+<% } %><% if (secureAccessOption) { %>is_public=$YNH_APP_ARG_IS_PUBLIC
+<% } %><% if (adminUserOption) { %>admin=$YNH_APP_ARG_ADMIN
+<% } %>
 
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
@@ -14,7 +16,9 @@ domain=$YNH_APP_ARG_DOMAIN
 ynh_abort_if_errors
 
 # store settings
-ynh_app_setting_set $app is_public $is_public
+<% if (secureAccessOption) { %>ynh_app_setting_set $app is_public $is_public
+<% } %><% if (adminUserOption) { %>ynh_app_setting_set $app admin $admin
+<% } %>
 
 # check or install docker
 dockerapp_ynh_checkinstalldocker
@@ -23,6 +27,7 @@ dockerapp_ynh_checkinstalldocker
 dockerapp_ynh_loadvariables
 ynh_webpath_available $domain $path
 ynh_webpath_register $app $domain $path
+dockerapp_ynh_findreplaceallvaribles
 
 # Copy files to the right place
 sudo rm -rf $data_path
@@ -34,11 +39,16 @@ dockerapp_ynh_run
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx
 
+<% if (secureAccessOption) { %>
 # Make app public if necessary or protect it
 if [ $is_public -eq 1 ]
 then
-        ynh_app_setting_set $app skipped_uris "/"
+    ynh_app_setting_set $app skipped_uris "/"
 fi
+<% } else { %>
+<% if (forceSecureAccess) { %><% } else { %>ynh_app_setting_set $app skipped_uris "/"<% } %>
+<% } %>
+
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices

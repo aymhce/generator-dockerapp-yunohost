@@ -29,44 +29,70 @@ dockerapp_ynh_checkinstalldocker () {
 
         if [ "$incontainer" == "0" ]
         then
-                echo "Ho ! You are in a Docker container :)";
+		MORE_LOG3=""
+		[ ! -d /home/yunohost.docker ] && MORE_LOG3=". Also, you have to mount shared volume from host, add '' -v /home/yunohost.docker:/home/yunohost.docker '' "
+		echo "Ho ! You are in a Docker container :)$MORE_LOG3";
 		MORE_LOG2=" If your already in a Docker container please add '' -e DOCKER_HOST=tcp://$(hostname -I | awk '{print $1}'):2376 '' or '' -v /var/run/docker.sock: /var/run/docker.sock ''"
         fi
 
 	if [ $ret != 0 ]
 	then
-		ynh_die "Sorry ! Your Docker deamon don't work$MORE_LOG1 ... Please check your system logs.$MORE_LOG2"
+		ynh_die "Sorry ! Your Docker deamon don't work$MORE_LOG1 ... Please check your system logs.$MORE_LOG2$MORE_LOG3"
 	fi
 
+}
+
+# find replace
+dockerapp_ynh_findreplace () {
+	for file in $(grep -rl "$2" "$1")
+	do
+		sed -i "s#$2#$3#g" "$file"
+	done
+}
+
+dockerapp_ynh_findreplacepath () {
+	dockerapp_ynh_findreplace docker/. "$1" "$2"
+	dockerapp_ynh_findreplace ../conf/. "$1" "$2"
+}
+
+# find replace all variables
+dockerapp_ynh_findreplaceallvaribles () {
+	dockerapp_ynh_findreplacepath "YNH_APP" "$app"
+        dockerapp_ynh_findreplacepath "YNH_DATA" "$data_path"
+        dockerapp_ynh_findreplacepath "YNH_PORT" "$port"
+        dockerapp_ynh_findreplacepath "YNH_PATH" "$path"
+        dockerapp_ynh_findreplacepath "YNH_HOST" "$docker_host"
+        dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
+	bash docker/_specificvariablesapp
 }
 
 # load variables
 dockerapp_ynh_loadvariables () {
 	data_path=/home/yunohost.docker/$app
-<% if (defaultPath != "") { %>path=$(ynh_normalize_url_path $path)<% } else { %>path=/<%}%>
-	port=$(ynh_find_port 21986)
+	port=$(ynh_app_setting_get $app port)
+	[ "$port" == "" ] && port=0
+<% if (defaultPathOption != "") { %>	path=$(ynh_normalize_url_path $path)<% } else { %>	path=/<%}%>
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
         if [ "$incontainer" == "0" ]
         then
                 docker_host=$(/sbin/ip route|awk '/default/ { print $3 }')
+                yunohost_id=$(cat /proc/self/cgroup | grep "docker/.*" | head -1 | sed "s@.*docker/\(.*\)@\1@")
         else
                 docker_host=$(hostname -I | awk '{print $1}')
         fi
+}
 
+# copy conf app
+dockerapp_ynh_copyconf () {
+	rm -rf $data_path
+	mkdir -p $data_path
+	cp -rf ../conf/app $data_path
 }
 
 # docker run
 dockerapp_ynh_run () {
-	sed -i "s@YNH_APP@$app@g" docker_run
-        sed -i "s@YNH_DATA@$data_path@g" docker_run
-	sed -i "s@YNH_PORT@$port@g" docker_run
-        sed -i "s@YNH_PATH@$path@g" docker_run
-	sed -i "s@YNH_APP@$app@g" docker-compose.yml
-	sed -i "s@YNH_DATA@$data_path@g" docker-compose.yml
-	sed -i "s@YNH_PORT@$port@g" docker-compose.yml
-	sed -i "s@YNH_PATH@$path@g" docker-compose.yml
-	ret=$(bash docker_run)
+	ret=$(bash docker/run)
         if [ "$ret" == "0" ]
 	then
 		docker logs $app
@@ -76,15 +102,17 @@ dockerapp_ynh_run () {
 
 # docker rm
 dockerapp_ynh_rm () {
-	sed -i "s@YNH_APP@$app@g" docker_rm
-	bash docker_rm
+	sed -i "s/YNH_APP/$app/g" docker/rm
+	bash docker/rm
 }
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx () {
-	sed -i "s@YNH_PATH@$path@g" ../conf/nginx.conf
-	sed -i "s@YNH_HOST@$docker_host@g" ../conf/nginx.conf
-	sed -i "s@YNH_PORT@$port@g" ../conf/nginx.conf
+	# get port after container created
+	port=$(docker port "$app" | awk -F':' '{print $NF}')
+	ynh_app_setting_set $app port $port
+	dockerapp_ynh_findreplacepath "YNH_2PORT" "$port"
+
 	nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
 	sudo cp ../conf/nginx.conf $nginxconf
 	sudo chown root: $nginxconf

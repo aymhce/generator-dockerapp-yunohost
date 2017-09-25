@@ -12,10 +12,13 @@ ynh_abort_if_errors
 
 # Retrieve app settings
 domain=$(ynh_app_setting_get "$app" domain)
-<% if (defaultPath != "") { %>path=$(ynh_app_setting_get "$app" path)
-<% } %>is_public=$(ynh_app_setting_get "$app" is_public)
+<% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
+<% } %><% if (secureAccessOption) { %>is_public=$(ynh_app_setting_get "$app" is_public)
+<% } %><% if (adminUserOption) { %>admin=$(ynh_app_setting_get "$app" admin)
+<% } %>
 
 dockerapp_ynh_loadvariables
+dockerapp_ynh_findreplaceallvaribles
 
 # docker rm
 dockerapp_ynh_rm
@@ -26,6 +29,7 @@ dockerapp_ynh_run
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx
 
+<% if (secureAccessOption) { %>
 # Make app public if necessary or protect it
 if [ $is_public -eq 1 ]
 then
@@ -33,6 +37,7 @@ then
 else
     ynh_app_setting_set $app protected_uris "/"
 fi
+<% } %>
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices

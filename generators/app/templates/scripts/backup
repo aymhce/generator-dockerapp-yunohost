@@ -11,7 +11,7 @@ ynh_abort_if_errors
 app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get "$app" domain)
-<% if (defaultPath != "") { %>path=$(ynh_app_setting_get "$app" path)
+<% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
 <% } %>
 
 dockerapp_ynh_loadvariables
@@ -19,4 +19,3 @@ dockerapp_ynh_loadvariables
 ynh_backup "$data_path" "data" 1
 
 ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"
-

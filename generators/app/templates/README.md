@@ -7,8 +7,8 @@
 
 [See more](<%= urlApp %>)
 
-This app is inside a Docker image.
+This app is inside a [Docker image](<%= urlDockerHub %>).
 
 ==========
 
-This app was generate with [DockerApp Yunohost](https://github.com/aymhce/dockerappmodel_ynh/)
+It was generated with [DockerApp Yunohost](https://github.com/aymhce/dockerappmodel_ynh/)

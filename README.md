@@ -1,10 +1,17 @@
 # generator-dockerapp-yunohost [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
 
 > Generate [Yunohost App](https://yunohost.org/) for easely [Docker App](https://hub.docker.com/) integration
->
-> Features : automatic docker install, automatic port management, is_public option, context_path option, work on [Yunohost docker container](https://hub.docker.com/r/domainelibre/), level 7 quality app
->
-> After first generation you can do regeneration with persist data in .yo-rc.json
+
+Features :
+  * automatic docker install
+  * automatic port management
+  * is_public option
+  * context_path option
+  * admin user option
+  * work on [Yunohost docker container](https://hub.docker.com/r/domainelibre/)
+  * level 7 quality app
+
+After first generation you can do regeneration with persist data in .yo-rc.json
 
 ## Installation
 

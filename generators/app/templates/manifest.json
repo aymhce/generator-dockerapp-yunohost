@@ -29,7 +29,7 @@
                     "fr": "Choisissez un domaine pour <%= beautifulName %>"
                 },
                 "example": "app.domain.org"
-            }<% if (defaultPath != "") { %>,
+            }<% if (defaultPathOption != "") { %>,
             {
                 "name": "path",
                 "type": "path",
@@ -38,16 +38,24 @@
                     "fr": "Choisissez un chemin pour <%= beautifulName %>"
                 },
                 "example": "/mypath",
-                "default": "/<%= defaultPath %>"
-            }<% } %>,{
+                "default": "/<%= defaultPathOption %>"
+            }<% } %><% if (secureAccessOption) { %>,{
                 "name": "is_public",
                 "type": "boolean",
                 "ask": {
                     "en": "Could non member access application ?",
                     "fr": "Une personne non membre peut elle accéder à l'application ?"
                 },
-                "default": true
-            }
+                "default": <% if (forceSecureAccess) { %>false<% } else { %>true<% } %>
+            }<% } %><% if (adminUserOption) { %>,{
+                "name": "admin",
+                "type": "user",
+                "ask": {
+                    "en": "Choose the <%= beautifulName %> administrator (must be an existing YunoHost user)",
+                    "fr": "Choisissez l'administrateur <%= beautifulName %> (doit etre un utilisateur Yunohost existant)"
+                },
+                "default": "homer"
+            }<% } %>
         ]
     }
 }

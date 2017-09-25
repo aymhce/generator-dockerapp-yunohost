@@ -3,9 +3,10 @@
 
 ;; Test complet
 	; Manifest
-		domain="domain.tld"	(DOMAIN)<% if (defaultPath != "") { %>
-		path="/<%= defaultPath %>"	(PATH)<% } %>
-		is_public=1	(PUBLIC|public=1|private=0)
+		domain="domain.tld"	(DOMAIN)<% if (defaultPathOption != "") { %>
+		path="/<%= defaultPath %>"	(PATH)<% } %><% if (secureAccessOption) { %>
+		is_public=1	(PUBLIC|public=1|private=0)<% } %><% if (adminUserOption) { %>
+		admin="john"    (USER)<% } %>
 	; Checks
 		pkg_linter=1
 		setup_sub_dir=1
