@@ -1,6 +1,6 @@
 {
   "name": "generator-dockerapp-yunohost",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Generate Yunohost App for easely Docker App integration",
   "homepage": "https://github.com/aymhce/dockerappmodel_ynh",
   "author": {

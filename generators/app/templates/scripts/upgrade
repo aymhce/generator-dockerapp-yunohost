@@ -8,7 +8,7 @@ set -eu
 
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
-. _common
+. _common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE

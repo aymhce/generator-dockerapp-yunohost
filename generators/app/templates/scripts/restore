@@ -34,10 +34,10 @@ test ! -d /home/yunohost.docker/$app \
 # IMPORT GENERIC HELPERS AFTER YNH_DIE FOR LINTER
 #=================================================
 
-[ ! -e _common ] && cp ../settings/scripts/_common ./.
-[ ! -e _dockertest ] && cp ../settings/scripts/_dockertest ./.
+[ ! -e _common.sh ] && cp ../settings/scripts/_common.sh ./.
+[ ! -e _dockertest.sh ] && cp ../settings/scripts/_dockertest.sh ./.
 [ ! -e docker/ ] && cp -rf ../settings/scripts/docker/ ./.
-. _common
+. _common.sh
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -57,7 +57,7 @@ dockerapp_ynh_findreplaceallvaribles
 # RESTORE THE APP MAIN DIR
 #=================================================
 
-sudo cp -a ./data "$data_path"
+ynh_restore_file "$data_path"
 
 #=================================================
 # START AND CREATE SERVICE
@@ -70,7 +70,7 @@ dockerapp_ynh_run
 # RESTORE THE NGINX CONFIGURATION
 #=================================================
 
-cp -a ./conf/nginx.conf "/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # RELOAD NGINX

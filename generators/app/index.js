@@ -84,24 +84,24 @@ module.exports = class extends Generator {
 
   writing() {
     this.fs.copyTpl(this.templatePath('check_process'), this.destinationPath('check_process'), this.props);
-    if (!this.fs.exists(this.destinationPath('scripts/docker/run'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker/run'), this.destinationPath('scripts/docker/run'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/run.sh'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/run.sh'), this.destinationPath('scripts/docker/run.sh'), this.props);
     }
     this.fs.copyTpl(this.templatePath('conf/nginx.conf'), this.destinationPath('conf/nginx.conf'), this.props);
-    if (!this.fs.exists(this.destinationPath('scripts/docker/rm'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker/rm'), this.destinationPath('scripts/docker/rm'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/rm.sh'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/rm.sh'), this.destinationPath('scripts/docker/rm.sh'), this.props);
     }
     if (!this.fs.exists(this.destinationPath('scripts/docker/docker-compose.yml'))) {
       this.fs.copyTpl(this.templatePath('scripts/docker/docker-compose.yml'), this.destinationPath('scripts/docker/docker-compose.yml'), this.props);
     }
-    if (!this.fs.exists(this.destinationPath('scripts/docker/_specificvariablesapp'))) {
-      this.fs.copyTpl(this.templatePath('scripts/docker/_specificvariablesapp'), this.destinationPath('scripts/docker/_specificvariablesapp'), this.props);
+    if (!this.fs.exists(this.destinationPath('scripts/docker/_specificvariablesapp.sh'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/_specificvariablesapp.sh'), this.destinationPath('scripts/docker/_specificvariablesapp.sh'), this.props);
     }
     this.fs.copyTpl(this.templatePath('conf/app/.gitkeep'), this.destinationPath('conf/app/.gitkeep'), this.props);
     this.fs.copyTpl(this.templatePath('manifest.json'), this.destinationPath('manifest.json'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/upgrade'), this.destinationPath('scripts/upgrade'), this.props);
-    this.fs.copyTpl(this.templatePath('scripts/_common'), this.destinationPath('scripts/_common'), this.props);
-    this.fs.copyTpl(this.templatePath('scripts/_dockertest'), this.destinationPath('scripts/_dockertest'), this.props);
+    this.fs.copyTpl(this.templatePath('scripts/_common.sh'), this.destinationPath('scripts/_common.sh'), this.props);
+    this.fs.copyTpl(this.templatePath('scripts/_dockertest.sh'), this.destinationPath('scripts/_dockertest.sh'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/install'), this.destinationPath('scripts/install'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/remove'), this.destinationPath('scripts/remove'), this.props);
     this.fs.copyTpl(this.templatePath('scripts/restore'), this.destinationPath('scripts/restore'), this.props);
@@ -114,6 +114,6 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.log('Please fill up "scripts/docker/run" and "scripts/docker/rm", as you want there is "scripts/docker/docker-compose.yml" and "scripts/docker/_specificvariablesapp". Also, place your app config in conf/app, will be copied in /home/yunohost.docker/{appname}');
+    this.log('Please fill up "scripts/docker/run.sh" and "scripts/docker/rm.sh", as you want there is "scripts/docker/docker-compose.yml" and "scripts/docker/_specificvariablesapp.sh". Also, place your app config in conf/app, will be copied in /home/yunohost.docker/{appname}');
   }
 };

@@ -13,7 +13,7 @@
         "email": "<%= authorEmail %>"
     },
     "requirements": {
-        "yunohost": ">> 2.5"
+        "yunohost": ">= 2.7.2"
     },
     "services": [
         "nginx"

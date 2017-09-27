@@ -2,5 +2,5 @@
 
 #example :
 #
-#. _common
+#. _common.sh
 #

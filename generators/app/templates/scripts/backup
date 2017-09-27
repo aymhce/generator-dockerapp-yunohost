@@ -7,8 +7,8 @@ set -eu
 #=================================================
 
 . /usr/share/yunohost/helpers
-[ ! -e _common ] && cp ../settings/scripts/_common ./_common
-. _common
+[ ! -e _common.sh ] && cp ../settings/scripts/_common.sh ./.
+. _common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -31,10 +31,10 @@ dockerapp_ynh_loadvariables
 # BACKUP THE APP MAIN DIR
 #=================================================
 
-ynh_backup "$data_path" "data" 1
+ynh_backup "$data_path"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"

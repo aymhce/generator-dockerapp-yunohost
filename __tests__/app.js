@@ -12,15 +12,15 @@ describe('generator-dockerapp-yunohost:app', () => {
   it('creates files', () => {
     assert.file(['manifest.json']);
     assert.file(['check_process']);
-    assert.file(['scripts/docker/run']);
+    assert.file(['scripts/docker/run.sh']);
     assert.file(['conf/nginx.conf']);
-    assert.file(['scripts/docker/rm']);
+    assert.file(['scripts/docker/rm.sh']);
     assert.file(['scripts/docker/docker-compose.yml']);
-    assert.file(['scripts/docker/_specificvariablesapp']);
+    assert.file(['scripts/docker/_specificvariablesapp.sh']);
     assert.file(['manifest.json']);
     assert.file(['scripts/upgrade']);
-    assert.file(['scripts/_common']);
-    assert.file(['scripts/_dockertest']);
+    assert.file(['scripts/_common.sh']);
+    assert.file(['scripts/_dockertest.sh']);
     assert.file(['scripts/install']);
     assert.file(['scripts/remove']);
     assert.file(['scripts/restore']);

@@ -20,7 +20,7 @@ domain=$YNH_APP_ARG_DOMAIN
 
 # Source YunoHost helpers
 . /usr/share/yunohost/helpers
-. _common
+. _common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -56,12 +56,11 @@ ynh_webpath_register $app $domain $path
 dockerapp_ynh_findreplaceallvaribles
 
 #=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
+# COPY CONF
 #=================================================
 
 # Copy files to the right place
-sudo rm -rf $data_path
-sudo mkdir -p $data_path
+dockerapp_ynh_copyconf
 
 #=================================================
 # START AND CREATE SERVICE

@@ -11,20 +11,20 @@ dockerapp_ynh_incontainer () {
 
 # check or do docker install
 dockerapp_ynh_checkinstalldocker () {
-	ret=$(sh _dockertest)
+	ret=$(sh _dockertest.sh)
 	incontainer=$(dockerapp_ynh_incontainer)
         if [ $ret == 127 ]
 	then
 		# install
 		start_docker="0"
-		[ ! -e /var/run/docker.sock ] && [ -z "$DOCKER_HOST" ] && start_docker="1"
+		[ ! -e /var/run/docker.sock ] && [ -z ${DOCKER_HOST+x} ] && start_docker="1"
 		curl -sSL https://get.docker.com | sh
 		[ "$start_docker" == "1" ] && systemctl start docker && systemctl enable docker
 		pip install docker-compose
 		MORE_LOG1=" despite previous docker installation"
 
 		# retest
-		ret=$(sh _dockertest)
+		ret=$(sh _dockertest.sh)
 	fi
 
         if [ "$incontainer" == "0" ]
@@ -46,7 +46,7 @@ dockerapp_ynh_checkinstalldocker () {
 dockerapp_ynh_findreplace () {
 	for file in $(grep -rl "$2" "$1")
 	do
-		sed -i "s#$2#$3#g" "$file"
+		ynh_replace_string "$2" "$3" "$file"
 	done
 }
 
@@ -63,7 +63,7 @@ dockerapp_ynh_findreplaceallvaribles () {
         dockerapp_ynh_findreplacepath "YNH_PATH" "$path"
         dockerapp_ynh_findreplacepath "YNH_HOST" "$docker_host"
         dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
-	bash docker/_specificvariablesapp
+	bash docker/_specificvariablesapp.sh
 }
 
 # load variables
@@ -85,25 +85,24 @@ dockerapp_ynh_loadvariables () {
 
 # copy conf app
 dockerapp_ynh_copyconf () {
-	rm -rf $data_path
 	mkdir -p $data_path
 	cp -rf ../conf/app $data_path
 }
 
 # docker run
 dockerapp_ynh_run () {
-	ret=$(bash docker/run)
-        if [ "$ret" != "0" ]
+	ret=$(bash docker/run.sh)
+	if [ "$ret" != "0" ]
 	then
 		docker logs $app
-                ynh_die "Sorry ! App cannot start with docker. Please check docker logs."
-        fi
+		ynh_die "Sorry ! App cannot start with docker. Please check docker logs."
+	fi
 }
 
 # docker rm
 dockerapp_ynh_rm () {
-	sed -i "s/YNH_APP/$app/g" docker/rm
-	bash docker/rm
+	ynh_replace_string "YNH_APP" "$app" docker/rm.sh
+	bash docker/rm.sh
 }
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
@@ -114,13 +113,13 @@ dockerapp_ynh_preparenginx () {
 	dockerapp_ynh_findreplacepath "YNH_2PORT" "$port"
 
 	nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
-	sudo cp ../conf/nginx.conf $nginxconf
-	sudo chown root: $nginxconf
-	sudo chmod 600 $nginxconf
+	cp ../conf/nginx.conf $nginxconf
+	chown root: $nginxconf
+	chmod 600 $nginxconf
 }
 
 # Reload Nginx and regenerate SSOwat conf
 dockerapp_ynh_reloadservices () {
-	sudo service nginx reload
-	sudo yunohost app ssowatconf
+	systemctl reload nginx
+	yunohost app ssowatconf
 }
