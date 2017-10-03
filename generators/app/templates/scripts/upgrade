@@ -23,7 +23,7 @@ ynh_abort_if_errors
 # Retrieve app settings
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
-<% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
+<% if (defaultPathOption != "") { %>path_url=$(ynh_app_setting_get "$app" path)
 <% } %><% if (secureAccessOption) { %>is_public=$(ynh_app_setting_get "$app" is_public)
 <% } %><% if (adminUserOption) { %>admin=$(ynh_app_setting_get "$app" admin)
 <% } %>
@@ -72,8 +72,8 @@ fi
 <% } %>
 
 #=================================================
-# RELOAD NGINX
+# RELOAD SSOWAT
 #=================================================
 
-# Reload Nginx and regenerate SSOwat conf
+# Regenerate SSOwat conf
 dockerapp_ynh_reloadservices

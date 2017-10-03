@@ -38,11 +38,11 @@ ynh_secure_remove $data_path
 # REMOVE NGINX CONFIGURATION
 #=================================================
 
-ynh_secure_remove /etc/nginx/conf.d/$domain.d/$app.conf
+ynh_remove_nginx_config
 
 #=================================================
-# RELOAD NGINX
+# RELOAD SSOWAT
 #=================================================
 
-# Reload Nginx and regenerate SSOwat conf
+# Regenerate SSOwat conf
 dockerapp_ynh_reloadservices

@@ -20,7 +20,7 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
-<% if (defaultPathOption != "") { %>path=$(ynh_app_setting_get "$app" path)
+<% if (defaultPathOption != "") { %>path_url=$(ynh_app_setting_get "$app" path)
 <% } %>
 
 #=================================================
@@ -71,10 +71,12 @@ dockerapp_ynh_run
 #=================================================
 
 ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
+systemctl reload nginx
 
 #=================================================
-# RELOAD NGINX
+# RELOAD SSOWAT
 #=================================================
 
-# Reload Nginx and regenerate SSOwat conf
+# Regenerate SSOwat conf
 dockerapp_ynh_reloadservices
+

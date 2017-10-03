@@ -60,7 +60,7 @@ dockerapp_ynh_findreplaceallvaribles () {
 	dockerapp_ynh_findreplacepath "YNH_APP" "$app"
         dockerapp_ynh_findreplacepath "YNH_DATA" "$data_path"
         dockerapp_ynh_findreplacepath "YNH_PORT" "$port"
-        dockerapp_ynh_findreplacepath "YNH_PATH" "$path"
+        dockerapp_ynh_findreplacepath "YNH_PATH" "$path_url"
         dockerapp_ynh_findreplacepath "YNH_HOST" "$docker_host"
         dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
 	bash docker/_specificvariablesapp.sh
@@ -71,7 +71,7 @@ dockerapp_ynh_loadvariables () {
 	data_path=/home/yunohost.docker/$app
 	port=$(ynh_app_setting_get $app port)
 	[ "$port" == "" ] && port=0
-<% if (defaultPathOption != "") { %>	path=$(ynh_normalize_url_path $path)<% } else { %>	path=/<%}%>
+<% if (defaultPathOption != "") { %>	path_url=$(ynh_normalize_url_path $path)<% } else { %>	path_url=/<%}%>
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
         if [ "$incontainer" == "0" ]
@@ -110,16 +110,11 @@ dockerapp_ynh_preparenginx () {
 	# get port after container created
 	port=$(docker port "$app" | awk -F':' '{print $NF}')
 	ynh_app_setting_set $app port $port
-	dockerapp_ynh_findreplacepath "YNH_2PORT" "$port"
 
-	nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
-	cp ../conf/nginx.conf $nginxconf
-	chown root: $nginxconf
-	chmod 600 $nginxconf
+	ynh_add_nginx_config
 }
 
-# Reload Nginx and regenerate SSOwat conf
+# Regenerate SSOwat conf
 dockerapp_ynh_reloadservices () {
-	systemctl reload nginx
 	yunohost app ssowatconf
 }

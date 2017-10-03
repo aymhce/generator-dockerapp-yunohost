@@ -7,6 +7,7 @@
         "en": "<%= enDescription %>",
         "fr": "<%= frDescription %>"
     },
+    "version": "1.0",
     "license": "GNU GPL",
     "maintainer": {
         "name": "<%= authorName %>",

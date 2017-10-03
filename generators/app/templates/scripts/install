@@ -9,7 +9,7 @@ set -eu
 # Retrieve arguments
 app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
-<% if (defaultPathOption != "") { %>path=$YNH_APP_ARG_PATH
+<% if (defaultPathOption != "") { %>path_url=$YNH_APP_ARG_PATH
 <% } %><% if (secureAccessOption) { %>is_public=$YNH_APP_ARG_IS_PUBLIC
 <% } %><% if (adminUserOption) { %>admin=$YNH_APP_ARG_ADMIN
 <% } %>
@@ -46,8 +46,8 @@ dockerapp_ynh_checkinstalldocker
 
 # Check domain/path availability
 dockerapp_ynh_loadvariables
-ynh_webpath_available $domain $path
-ynh_webpath_register $app $domain $path
+ynh_webpath_available $domain $path_url
+ynh_webpath_register $app $domain $path_url
 
 #=================================================
 # MODIFY A CONFIG FILE
@@ -91,8 +91,8 @@ fi
 <% } %>
 
 #=================================================
-# RELOAD NGINX
+# RELOAD SSOWAT
 #=================================================
 
-# Reload Nginx and regenerate SSOwat conf
+# Regenerate SSOwat conf
 dockerapp_ynh_reloadservices
