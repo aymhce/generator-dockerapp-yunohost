@@ -6,7 +6,7 @@ set -eu
 # IMPORT GENERIC HELPERS
 #=================================================
 
-. /usr/share/yunohost/helpers
+source /usr/share/yunohost/helpers
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -37,7 +37,7 @@ test ! -d /home/yunohost.docker/$app \
 [ ! -e _common.sh ] && cp ../settings/scripts/_common.sh ./.
 [ ! -e _dockertest.sh ] && cp ../settings/scripts/_dockertest.sh ./.
 [ ! -e docker/ ] && cp -rf ../settings/scripts/docker/ ./.
-. _common.sh
+source _common.sh
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS

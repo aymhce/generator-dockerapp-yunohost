@@ -14,4 +14,6 @@
 #
 #docker run -d --name=YNH_APP --restart always $options $other_options $image >/dev/null 2>&1
 #echo $?
-
+#
+# waiting time before effective app be started
+#sleep 30

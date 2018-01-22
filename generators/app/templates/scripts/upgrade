@@ -1,14 +1,12 @@
 #!/bin/bash
 
-set -eu
-
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
 # Source YunoHost helpers
-. /usr/share/yunohost/helpers
-. _common.sh
+source _common.sh
+source /usr/share/yunohost/helpers
 
 #=================================================
 # MANAGE SCRIPT FAILURE

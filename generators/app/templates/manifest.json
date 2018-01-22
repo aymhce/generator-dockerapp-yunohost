@@ -8,7 +8,7 @@
         "fr": "<%= frDescription %>"
     },
     "version": "1.0",
-    "license": "GNU GPL",
+    "license": "AGPL-3.0",
     "maintainer": {
         "name": "<%= authorName %>",
         "email": "<%= authorEmail %>"

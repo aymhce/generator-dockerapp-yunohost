@@ -44,7 +44,7 @@ dockerapp_ynh_checkinstalldocker () {
 
 # find replace
 dockerapp_ynh_findreplace () {
-	for file in $(grep -rl "$2" "$1")
+	for file in $(grep -rl "$2" "$1" 2>/dev/null)
 	do
 		ynh_replace_string "$2" "$3" "$file"
 	done
@@ -62,7 +62,7 @@ dockerapp_ynh_findreplaceallvaribles () {
         dockerapp_ynh_findreplacepath "YNH_PORT" "$port"
         dockerapp_ynh_findreplacepath "YNH_PATH" "$path_url"
         dockerapp_ynh_findreplacepath "YNH_HOST" "$docker_host"
-        dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
+        [ "$incontainer" == "0" ] && dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
 	bash docker/_specificvariablesapp.sh
 }
 
@@ -95,6 +95,9 @@ dockerapp_ynh_run () {
 	if [ "$ret" != "0" ]
 	then
 		docker logs $app
+		docker inspect $app
+		# fix after yunohost restore iptables issue
+		[ "$ret" == "125" ] && docker inspect $app | grep "Error" | grep -q "iptables failed" && systemctl restart docker && return 0
 		ynh_die "Sorry ! App cannot start with docker. Please check docker logs."
 	fi
 }
@@ -110,7 +113,13 @@ dockerapp_ynh_preparenginx () {
 	# get port after container created
 	port=$(docker port "$app" | awk -F':' '{print $NF}')
 	ynh_app_setting_set $app port $port
+	ynh_replace_string "__DOCKER_HOST__" "$docker_host" "../conf/nginx.conf"
 
+<% if (defaultPathOption != "") { %>	if [ "$path_url" != "/" ]
+	then
+		ynh_replace_string "^#sub_path_only" "" "../conf/nginx.conf"
+	fi
+<% } %>
 	ynh_add_nginx_config
 }
 

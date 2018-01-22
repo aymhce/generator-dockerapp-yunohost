@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu
-
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
@@ -19,8 +17,8 @@ domain=$YNH_APP_ARG_DOMAIN
 #=================================================
 
 # Source YunoHost helpers
-. /usr/share/yunohost/helpers
-. _common.sh
+source _common.sh
+source /usr/share/yunohost/helpers
 
 #=================================================
 # MANAGE SCRIPT FAILURE
