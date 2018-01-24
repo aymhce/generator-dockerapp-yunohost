@@ -27,14 +27,6 @@ dockerapp_ynh_checkinstalldocker () {
 		ret=$(sh _dockertest.sh)
 	fi
 
-        if [ "$incontainer" == "0" ]
-        then
-		MORE_LOG3=""
-		[ ! -d /home/yunohost.docker ] && MORE_LOG3=". Also, you have to mount shared volume from host, add '' -v /home/yunohost.docker:/home/yunohost.docker '' "
-		echo "Ho ! You are in a Docker container :)$MORE_LOG3";
-		MORE_LOG2=" If your already in a Docker container please add '' -e DOCKER_HOST=tcp://$(hostname -I | awk '{print $1}'):2376 '' or '' -v /var/run/docker.sock: /var/run/docker.sock ''"
-        fi
-
 	if [ $ret != 0 ]
 	then
 		ynh_die "Sorry ! Your Docker deamon don't work$MORE_LOG1 ... Please check your system logs.$MORE_LOG2$MORE_LOG3"
@@ -61,8 +53,6 @@ dockerapp_ynh_findreplaceallvaribles () {
         dockerapp_ynh_findreplacepath "YNH_DATA" "$data_path"
         dockerapp_ynh_findreplacepath "YNH_PORT" "$port"
         dockerapp_ynh_findreplacepath "YNH_PATH" "$path_url"
-        dockerapp_ynh_findreplacepath "YNH_HOST" "$docker_host"
-        [ "$incontainer" == "0" ] && dockerapp_ynh_findreplacepath "YNH_ID" "$yunohost_id"
 	bash docker/_specificvariablesapp.sh
 }
 
@@ -74,13 +64,8 @@ dockerapp_ynh_loadvariables () {
 <% if (defaultPathOption != "") { %>	path_url=$(ynh_normalize_url_path $path)<% } else { %>	path_url=/<%}%>
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
-        if [ "$incontainer" == "0" ]
-        then
-                docker_host=$(/sbin/ip route|awk '/default/ { print $3 }')
-                yunohost_id=$(cat /proc/self/cgroup | grep "docker/.*" | head -1 | sed "s@.*docker/\(.*\)@\1@")
-        else
-                docker_host=$(hostname -I | awk '{print $1}')
-        fi
+        docker_host=localhost
+	#$(hostname -I | awk '{print $1}')
 }
 
 # copy conf app
@@ -94,8 +79,6 @@ dockerapp_ynh_run () {
 	ret=$(bash docker/run.sh)
 	if [ "$ret" != "0" ]
 	then
-		docker logs $app
-		docker inspect $app
 		# fix after yunohost restore iptables issue
 		[ "$ret" == "125" ] && docker inspect $app | grep "Error" | grep -q "iptables failed" && systemctl restart docker && return 0
 		ynh_die "Sorry ! App cannot start with docker. Please check docker logs."
