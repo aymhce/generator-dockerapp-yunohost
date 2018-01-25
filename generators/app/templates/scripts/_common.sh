@@ -21,7 +21,6 @@ dockerapp_ynh_checkinstalldocker () {
 		curl -sSL https://get.docker.com | sh
 		[ "$start_docker" == "1" ] && systemctl start docker && systemctl enable docker
 		pip install docker-compose
-		MORE_LOG1=" despite previous docker installation"
 
 		# retest
 		ret=$(sh _dockertest.sh)
@@ -29,7 +28,7 @@ dockerapp_ynh_checkinstalldocker () {
 
 	if [ $ret != 0 ]
 	then
-		ynh_die "Sorry ! Your Docker deamon don't work$MORE_LOG1 ... Please check your system logs.$MORE_LOG2$MORE_LOG3"
+		ynh_die "Sorry ! Your Docker deamon don't work ... Please check your system logs."
 	fi
 
 }
@@ -65,7 +64,6 @@ dockerapp_ynh_loadvariables () {
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
         docker_host=localhost
-	#$(hostname -I | awk '{print $1}')
 }
 
 # copy conf app
