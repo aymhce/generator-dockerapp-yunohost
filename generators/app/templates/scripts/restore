@@ -65,7 +65,13 @@ ynh_restore_file "$data_path"
 
 # docker run
 dockerapp_ynh_run
+<% if (scriptsLoadSave) { %>
+#=================================================
+# RESTORE DATA IN CONTAINER
+#=================================================
 
+dockerapp_ynh_load
+<% } %>
 #=================================================
 # RESTORE THE NGINX CONFIGURATION
 #=================================================

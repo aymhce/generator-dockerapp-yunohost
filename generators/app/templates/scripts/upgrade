@@ -33,7 +33,13 @@ dockerapp_ynh_loadvariables
 #=================================================
 
 dockerapp_ynh_findreplaceallvaribles
+<% if (scriptsLoadSave) { %>
+#=================================================
+# BACKUP DATA IN CONTAINER
+#=================================================
 
+dockerapp_ynh_save
+<% } %>
 #=================================================
 # STOP AND REMOVE SERVICE
 #=================================================
@@ -47,6 +53,13 @@ dockerapp_ynh_rm
 
 # docker run
 dockerapp_ynh_run
+<% if (scriptsLoadSave) { %>
+#=================================================
+# RESTORE DATA IN CONTAINER
+#=================================================
+
+dockerapp_ynh_load
+<% } %>
 
 #=================================================
 # NGINX CONFIGURATION

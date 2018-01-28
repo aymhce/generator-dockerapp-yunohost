@@ -73,6 +73,8 @@ module.exports = class extends Generator {
     return this.prompt(prompts).then(props => {
       this.props = props;
       this.props.idName = this.props.beautifulName.toLowerCase();
+      this.props.reverseProxyProtocol = 'http';
+      this.props.scriptsLoadSave = false;
       if (!this.props.enDescription) {
         this.props.enDescription = String(this.props.beautifulName) + ' App for Yunohost';
       }
@@ -84,6 +86,12 @@ module.exports = class extends Generator {
 
   writing() {
     this.fs.copyTpl(this.templatePath('check_process'), this.destinationPath('check_process'), this.props);
+    if (this.props.scriptsLoadSave && !this.fs.exists(this.destinationPath('scripts/docker/load.sh'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/load.sh'), this.destinationPath('scripts/docker/load.sh'), this.props);
+    }
+    if (this.props.scriptsLoadSave && !this.fs.exists(this.destinationPath('scripts/docker/save.sh'))) {
+      this.fs.copyTpl(this.templatePath('scripts/docker/save.sh'), this.destinationPath('scripts/docker/save.sh'), this.props);
+    }
     if (!this.fs.exists(this.destinationPath('scripts/docker/run.sh'))) {
       this.fs.copyTpl(this.templatePath('scripts/docker/run.sh'), this.destinationPath('scripts/docker/run.sh'), this.props);
     }
@@ -114,6 +122,10 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.log('Please fill up "scripts/docker/run.sh" and "scripts/docker/rm.sh", as you want there is "scripts/docker/docker-compose.yml" and "scripts/docker/_specificvariablesapp.sh". Also, place your app config in conf/app, will be copied in /home/yunohost.docker/{appname}');
+    var scriptsLoadSave = '';
+    if (this.props.scriptsLoadSave) {
+      scriptsLoadSave = '\n - "scripts/docker/save.sh" (for backup)\n - "scripts/docker/load.sh (for restore)"';
+    }
+    this.log('\nGreat ! Now please fill up :\n - "scripts/docker/run.sh"\n - "scripts/docker/rm.sh"\n\nAs you want there is :\n - "scripts/docker/docker-compose.yml"' + scriptsLoadSave + '\n - "scripts/docker/_specificvariablesapp.sh"\n\nAlso, place your app config in conf/app, will be copied in /home/yunohost.docker/{appname}');
   }
 };

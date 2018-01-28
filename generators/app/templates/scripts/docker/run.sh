@@ -7,7 +7,7 @@
 #[ "$architecture" == "armhf" ] && image=portainer/portainer:linux-arm-1.14.0
 #[ "$architecture" == "minitel" ] && ynh_die "Sorry, your minitel architecture is not supported ..."
 #
-#options="-p YNH_PORT:9000 -v YNH_DATA/data:/data"
+#options="-p $port:9000 -v $data_path/data:/data"
 #
-#docker run -d --name=YNH_APP --restart always $options $image >/dev/null 2>&1
+#docker run -d --name=$app --restart always $options $image >/dev/null 2>&1
 #echo $?

@@ -10,6 +10,8 @@ Features :
   * admin user option
   * work on [Yunohost docker container](https://hub.docker.com/r/domainelibre/)
   * level 7 quality app
+  * optional load/save scripts
+  * optional custom reverse proxy protocol
 
 After first generation you can do regeneration with persist data in .yo-rc.json
 

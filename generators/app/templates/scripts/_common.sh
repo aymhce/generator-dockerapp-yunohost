@@ -42,7 +42,6 @@ dockerapp_ynh_findreplace () {
 }
 
 dockerapp_ynh_findreplacepath () {
-	dockerapp_ynh_findreplace docker/. "$1" "$2"
 	dockerapp_ynh_findreplace ../conf/. "$1" "$2"
 }
 
@@ -57,13 +56,14 @@ dockerapp_ynh_findreplaceallvaribles () {
 
 # load variables
 dockerapp_ynh_loadvariables () {
-	data_path=/home/yunohost.docker/$app
-	port=$(ynh_app_setting_get $app port)
+	export app=$app
+        export domain=$domain
+	export data_path=/home/yunohost.docker/$app
+	export port=$(ynh_app_setting_get $app port)
 	[ "$port" == "" ] && port=0
 <% if (defaultPathOption != "") { %>	path_url=$(ynh_normalize_url_path $path)<% } else { %>	path_url=/<%}%>
 	export architecture=$(dpkg --print-architecture)
 	export incontainer=$(dockerapp_ynh_incontainer)
-        docker_host=localhost
 }
 
 # copy conf app
@@ -85,17 +85,27 @@ dockerapp_ynh_run () {
 
 # docker rm
 dockerapp_ynh_rm () {
-	ynh_replace_string "YNH_APP" "$app" docker/rm.sh
 	bash docker/rm.sh
+}
+<% if (scriptsLoadSave) { %>
+# docker load
+dockerapp_ynh_load () {
+        bash docker/load.sh
+}
+
+# docker save
+dockerapp_ynh_save () {
+        bash docker/save.sh
+}
+<% } %>
+# get port from docker
+dockerapp_ynh_getandsaveport () {
+        export port=$(docker port "$app" | awk -F':' '{print $NF}')
+        ynh_app_setting_set $app port $port
 }
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 dockerapp_ynh_preparenginx () {
-	# get port after container created
-	port=$(docker port "$app" | awk -F':' '{print $NF}')
-	ynh_app_setting_set $app port $port
-	ynh_replace_string "__DOCKER_HOST__" "$docker_host" "../conf/nginx.conf"
-
 <% if (defaultPathOption != "") { %>	if [ "$path_url" != "/" ]
 	then
 		ynh_replace_string "^#sub_path_only" "" "../conf/nginx.conf"

@@ -7,6 +7,7 @@ set -eu
 #=================================================
 
 [ ! -e _common.sh ] && cp ../settings/scripts/_common.sh ./.
+[ ! -e docker/ ] && cp -rf ../settings/scripts/docker/ ./.
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -26,7 +27,13 @@ domain=$(ynh_app_setting_get "$app" domain)
 <% } %>
 
 dockerapp_ynh_loadvariables
+<% if (scriptsLoadSave) { %>
+#=================================================
+# BACKUP DATA IN CONTAINER
+#=================================================
 
+dockerapp_ynh_save
+<% } %>
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================

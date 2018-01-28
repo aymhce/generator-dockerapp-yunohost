@@ -2,5 +2,5 @@
 
 # example :
 #
-#docker rm -f YNH_APP >/dev/null 2>&1
+#docker rm -f $app >/dev/null 2>&1
 #echo $?
