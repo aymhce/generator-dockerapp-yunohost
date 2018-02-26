@@ -27,7 +27,7 @@ module.exports = class extends Generator {
     }, {
       type: 'confirm',
       name: 'secureAccessOption',
-      message: 'Active secure access option (public access or yunohost auth) ?',
+      message: 'Active secure access option (yunohost auth or public access) ?',
       default: false
     }, {
       type: 'confirm',

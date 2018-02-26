@@ -9,6 +9,17 @@ dockerapp_ynh_incontainer () {
         fi
 }
 
+# docker driver setter
+dockerapp_ynh_driversetter () {
+	echo -e "{\n\t\"debug\": false,\n\t\"storage-driver\": \"$1\"\n}\n" > /etc/docker/daemon.json
+	systemctl stop docker >/dev/null 2>&1
+	rm -rf /var/lib/docker
+	mkdir -p /var/lib/docker
+	systemctl start docker >/dev/null 2>&1
+	sleep 30
+	echo $(sh _dockertest.sh)
+}
+
 # check or do docker install
 dockerapp_ynh_checkinstalldocker () {
 	ret=$(sh _dockertest.sh)
@@ -16,11 +27,15 @@ dockerapp_ynh_checkinstalldocker () {
         if [ $ret == 127 ]
 	then
 		# install
-		start_docker="0"
-		[ ! -e /var/run/docker.sock ] && [ -z ${DOCKER_HOST+x} ] && start_docker="1"
 		curl -sSL https://get.docker.com | sh
-		[ "$start_docker" == "1" ] && systemctl start docker && systemctl enable docker
-		pip install docker-compose
+		systemctl enable docker
+		curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+		#for d in overlay2 overlay devicemapper aufs vfs
+		#do
+		#	echo "apply $d driver and test it"
+		#	[ "$(dockerapp_ynh_driversetter $d)" == "0" ] && echo "$d driver will be used" 1>&2 && break
+		#done
 
 		# retest
 		ret=$(sh _dockertest.sh)
