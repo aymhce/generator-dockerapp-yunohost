@@ -67,9 +67,6 @@ dockerapp_ynh_copyconf
 # docker run
 dockerapp_ynh_run
 
-# get and save port
-dockerapp_ynh_getandsaveport
-
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
