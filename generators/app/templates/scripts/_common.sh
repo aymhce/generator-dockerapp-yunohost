@@ -115,7 +115,8 @@ dockerapp_ynh_save () {
 <% } %>
 # get port from docker
 dockerapp_ynh_getandsaveport () {
-        export port=$(docker port "$app" | awk -F':' '{print $NF}')
+        source docker/_specificvariablesapp.sh
+        export port=$(docker port "${app}${suffixapp}" | awk -F':' '{print $NF}')
         ynh_app_setting_set $app port $port
 }
 
