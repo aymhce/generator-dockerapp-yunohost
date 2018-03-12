@@ -33,6 +33,13 @@ dockerapp_ynh_loadvariables
 #=================================================
 
 dockerapp_ynh_findreplaceallvaribles
+
+#=================================================
+# COPY CONF
+#=================================================
+
+# Copy files to the right place
+dockerapp_ynh_copyconf
 <% if (scriptsLoadSave) { %>
 #=================================================
 # BACKUP DATA IN CONTAINER
